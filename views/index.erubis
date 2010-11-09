@@ -1,0 +1,122 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+   "http://www.w3.org/TR/html4/loose.dtd">
+
+<html lang="en">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<!--[if IE]><script language="javascript" type="text/javascript" src="jquery/excanvas.min.js"></script><![endif]--> 
+  <script language="javascript" type="text/javascript" src="jquery/jquery-1.4.2.min.js"></script> 
+  <script language="javascript" type="text/javascript" src="jquery/jquery.jqplot.min.js"></script> 
+
+  <link rel="stylesheet" type="text/css" href="jquery/jquery.jqplot.css" /> 
+  <link rel="stylesheet" href="jquery/jspec.min.css" type="text/css" media="screen" title="no title" charset="utf-8"> 
+
+<script>
+var running = false;
+var lines;
+var chart;
+var secs;
+
+function plot(){
+  params = [];
+  $('.path').each(function(i){
+    params.push($(this).val());
+  });
+
+$.ajax({
+  url: 's',
+  data: {host: $("#host").val(), path: params },
+  success: function(str) {
+    data = $.parseJSON(str);
+    i = 0;
+    now = ((new Date().getTime()) - secs) / 1000;
+
+    $.each(data,function(k,v){
+      lines[k].push([now,parseInt(v)]);
+    });
+    $("#chartdiv").text("");
+    chart = $.jqplot('chartdiv', lines , {
+      title: 'SNMP Chart', 
+      seriesDefaults: {show:true,showMarker:false},
+      axes:{
+        xaxis:{
+          label:'seconds',
+          autoscale: true
+        },
+        yaxis:{
+          autoscale: true
+        }
+      }
+    });
+  }
+});
+
+if(running){
+setTimeout("plot()",2000);
+}
+}
+
+function stop(){
+ $(this).val("Start!").one('click',start);
+
+ $("#host").attr("disabled",false);
+ $(".path").attr("disabled",false);
+ running = false;
+}
+
+function start(){
+ $(this).val("Stop!").one('click',stop);
+ $("#host").attr("disabled",true);
+ $(".path").attr("disabled",true);
+ running = true;
+ lines = [];
+ i = 0;
+ $('.path').each(function(){
+   lines[i++] = [];
+ });
+
+ secs = new Date().getTime();
+ plot();
+}
+
+function delpath(x){
+$(this).parent().remove();
+}
+ 
+function addpath(){
+np = $('#rootpath').clone();
+$(np).appendTo('#paths');
+$(np).find(':input').val("").focus();
+$(np).find('.delpath').toggle().one('click',delpath);
+}
+
+
+$(document).ready(function(){
+      $.jqplot.config.enablePlugins = true;
+      $('#control').val('Start!').one('click',start);
+
+      $('#addpath').bind('click',addpath);
+});
+</script>
+
+
+</head>
+<body>
+<p><div id="console"></div></p>
+<div id="page" style="margin-left: 400px;">
+  <p>Host<br>
+  <input type=text name=host id=host size=30 >
+  </p>
+  <div id="paths">
+    <span id="rootpath">
+      <p>Path<br>
+      <input type=text name=path class="path" size=60 ><span class="delpath" style="display:none;">[delete]</span>
+    </span>
+  </div>
+  </p>
+  <p><input type=button id="addpath" value="Add Path"> | <input type=button id="control" value="Start"></p>
+  <p><div id="chartdiv" style="height:420px; width:740px;"></div></p>
+</div>
+</body>
+</html>
+

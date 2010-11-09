@@ -1,0 +1,7 @@
+* clone
+* Run 'bundle' ( downloads all dependencies )
+* ruby snmp-plot.rb
+* access http://localhost:9091
+
+
+Right now it supports number OIDS only, ex: 1.3.6.1.2.1.2.2.1.16.1

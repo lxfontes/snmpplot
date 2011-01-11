@@ -1,6 +1,6 @@
 * clone
 * Run 'bundle' ( downloads all dependencies )
-* ruby snmp-plot.rb
+* rackup -p 9091
 * access http://localhost:9091
 
 

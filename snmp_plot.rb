@@ -8,7 +8,7 @@ class SNMPPlot < Sinatra::Base
   include SNMP
 
   enable :static
-  set :public, File.dirname( __FILE__ ) + '/public' 
+  set :public, File.dirname( __FILE__ ) + '/public'
 
   get '/s' do
     host = params[:host]
@@ -31,6 +31,3 @@ class SNMPPlot < Sinatra::Base
 
 
 end
-
-SNMPPlot.run! :host => '0.0.0.0', :port => 9091
-
